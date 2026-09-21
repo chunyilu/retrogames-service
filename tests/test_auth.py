@@ -36,6 +36,22 @@ def test_health_check(client):
     assert response.status_code == 200
     assert response.get_json() == {'status': 'healthy'}
 
+    # HEAD request support
+    head_res = client.head('/health')
+    assert head_res.status_code == 200
+
+
+def test_index_route(client):
+    response = client.get('/')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['status'] == 'healthy'
+    assert 'endpoints' in data
+
+    # HEAD request support
+    head_res = client.head('/')
+    assert head_res.status_code == 200
+
 
 def test_register_success(client):
     response = client.post('/register', json={

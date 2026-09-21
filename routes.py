@@ -140,6 +140,22 @@ def get_user_scores(user_id):
     }), 200
 
 
-@auth_bp.route('/health', methods=['GET'])
+@auth_bp.route('/', methods=['GET', 'HEAD'])
+def index():
+    return jsonify({
+        'service': 'RetroGames Authentication Service',
+        'status': 'healthy',
+        'endpoints': {
+            'health': '/health',
+            'register': 'POST /register',
+            'login': 'POST /login',
+            'record_score': 'POST /scores',
+            'game_scores': 'GET /scores/<game_id>',
+            'user_scores': 'GET /users/<user_id>/scores'
+        }
+    }), 200
+
+
+@auth_bp.route('/health', methods=['GET', 'HEAD'])
 def health():
     return jsonify({'status': 'healthy'}), 200
