@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 import bcrypt
 
@@ -29,4 +30,25 @@ class User(db.Model):
         return {
             'id': self.id,
             'email': self.email
+        }
+
+
+class GameScore(db.Model):
+    __tablename__ = 'game_scores'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    game_id = db.Column(db.String(100), nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = db.relationship('User', backref=db.backref('scores', lazy=True))
+
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'userId': self.user_id,
+            'gameId': self.game_id,
+            'score': self.score,
+            'createdAt': self.created_at.isoformat() if self.created_at else None
         }

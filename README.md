@@ -23,11 +23,12 @@ This service replaces the previous Node.js/Express implementation, providing `/r
 retrogames-service/
 ├── app.py              # Application factory and entry point
 ├── config.py           # Configuration (Database URI, secret key, port)
-├── models.py           # SQLAlchemy User model & password methods
-├── routes.py           # Auth routes (/register, /login, /health)
+├── models.py           # SQLAlchemy User and GameScore models
+├── routes.py           # Auth and score routes
 ├── requirements.txt    # Python dependencies
 ├── tests/
-│   └── test_auth.py    # Unit & integration tests
+│   ├── test_auth.py    # Auth unit & integration tests
+│   └── test_scores.py  # Score unit & integration tests
 └── README.md           # Documentation
 ```
 
@@ -142,7 +143,107 @@ PORT=5000 DATABASE_URL=sqlite:///auth.db python app.py
 
 ---
 
-### 3. Health Check
+### 3. Record Game Score
+- **Method:** `POST`
+- **Path:** `/scores`
+- **Headers:** `Content-Type: application/json`
+- **Request Body:**
+  ```json
+  {
+    "userId": 1,
+    "gameId": "pacman",
+    "score": 1500
+  }
+  ```
+  *(Both camelCase `userId`/`gameId` and snake_case `user_id`/`game_id` are supported)*
+- **Responses:**
+  - `201 Created`:
+    ```json
+    {
+      "message": "Score recorded successfully!",
+      "score": {
+        "id": 1,
+        "userId": 1,
+        "gameId": "pacman",
+        "score": 1500,
+        "createdAt": "2026-09-21T23:00:00.000000+00:00"
+      }
+    }
+    ```
+  - `400 Bad Request` (Missing fields or invalid score value):
+    ```json
+    {
+      "error": "userId, gameId, and score are required."
+    }
+    ```
+  - `404 Not Found` (User does not exist):
+    ```json
+    {
+      "error": "User not found."
+    }
+    ```
+
+---
+
+### 4. Get Game Scores / Leaderboard
+- **Method:** `GET`
+- **Path:** `/scores/<game_id>` or `/scores/leaderboard/<game_id>`
+- **Query Parameters:** `limit` (optional, integer limit on number of results)
+- **Responses:**
+  - `200 OK`:
+    ```json
+    {
+      "gameId": "pacman",
+      "scores": [
+        {
+          "id": 2,
+          "userId": 2,
+          "gameId": "pacman",
+          "score": 3000,
+          "createdAt": "2026-09-21T23:00:00.000000+00:00"
+        },
+        {
+          "id": 1,
+          "userId": 1,
+          "gameId": "pacman",
+          "score": 1500,
+          "createdAt": "2026-09-21T22:30:00.000000+00:00"
+        }
+      ]
+    }
+    ```
+
+---
+
+### 5. Get User Scores
+- **Method:** `GET`
+- **Path:** `/users/<user_id>/scores`
+- **Responses:**
+  - `200 OK`:
+    ```json
+    {
+      "userId": 1,
+      "scores": [
+        {
+          "id": 1,
+          "userId": 1,
+          "gameId": "pacman",
+          "score": 1500,
+          "createdAt": "2026-09-21T23:00:00.000000+00:00"
+        }
+      ]
+    }
+    ```
+  - `404 Not Found` (User does not exist):
+    ```json
+    {
+      "error": "User not found."
+    }
+    ```
+
+---
+
+### 6. Health Check
 - **Method:** `GET`
 - **Path:** `/health`
 - **Response:**
