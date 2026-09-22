@@ -16,7 +16,7 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     # Initialize extensions
-    CORS(app)
+    CORS(app, origin=["https://chunyilu.github.io"])
     db.init_app(app)
 
     # Register blueprints
