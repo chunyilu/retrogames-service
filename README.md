@@ -143,7 +143,29 @@ PORT=5000 DATABASE_URL=sqlite:///auth.db python app.py
 
 ---
 
-### 3. Record Game Score
+### 3. Get All Users
+- **Method:** `GET`
+- **Path:** `/users`
+- **Responses:**
+  - `200 OK`:
+    ```json
+    {
+      "users": [
+        {
+          "id": 1,
+          "email": "player1@retro.net"
+        },
+        {
+          "id": 2,
+          "email": "player2@retro.net"
+        }
+      ]
+    }
+    ```
+
+---
+
+### 4. Record Game Score
 - **Method:** `POST`
 - **Path:** `/scores`
 - **Headers:** `Content-Type: application/json`
@@ -185,7 +207,7 @@ PORT=5000 DATABASE_URL=sqlite:///auth.db python app.py
 
 ---
 
-### 4. Get Game Scores / Leaderboard
+### 5. Get Game Scores / Leaderboard
 - **Method:** `GET`
 - **Path:** `/scores/<game_id>` or `/scores/leaderboard/<game_id>`
 - **Query Parameters:** `limit` (optional, integer limit on number of results)
@@ -215,7 +237,7 @@ PORT=5000 DATABASE_URL=sqlite:///auth.db python app.py
 
 ---
 
-### 5. Get User Scores
+### 6. Get User Scores
 - **Method:** `GET`
 - **Path:** `/users/<user_id>/scores`
 - **Responses:**
@@ -243,7 +265,7 @@ PORT=5000 DATABASE_URL=sqlite:///auth.db python app.py
 
 ---
 
-### 6. Health Check
+### 7. Health Check
 - **Method:** `GET`
 - **Path:** `/health`
 - **Response:**

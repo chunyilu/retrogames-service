@@ -127,6 +127,17 @@ def get_game_scores(game_id):
     }), 200
 
 
+@auth_bp.route('/users', methods=['GET'])
+def get_users():
+    try:
+        users = User.query.order_by(User.id.asc()).all()
+        return jsonify({
+            'users': [user.to_dict() for user in users]
+        }), 200
+    except Exception:
+        return jsonify({'error': 'Database error.'}), 500
+
+
 @auth_bp.route('/users/<int:user_id>/scores', methods=['GET'])
 def get_user_scores(user_id):
     user = db.session.get(User, user_id)
@@ -149,6 +160,7 @@ def index():
             'health': '/health',
             'register': 'POST /register',
             'login': 'POST /login',
+            'users': 'GET /users',
             'record_score': 'POST /scores',
             'game_scores': 'GET /scores/<game_id>',
             'user_scores': 'GET /users/<user_id>/scores'

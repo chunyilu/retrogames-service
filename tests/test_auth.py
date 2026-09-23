@@ -147,3 +147,33 @@ def test_login_missing_fields(client):
     })
     assert response.status_code == 400
     assert response.get_json() == {'error': 'Email and password are required.'}
+
+
+def test_get_users_empty(client):
+    response = client.get('/users')
+    assert response.status_code == 200
+    assert response.get_json() == {'users': []}
+
+
+def test_get_users_multiple(client):
+    client.post('/register', json={
+        'email': 'user1@retro.net',
+        'password': 'password123'
+    })
+    client.post('/register', json={
+        'email': 'user2@retro.net',
+        'password': 'password456'
+    })
+
+    response = client.get('/users')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert 'users' in data
+    assert len(data['users']) == 2
+    assert data['users'][0]['email'] == 'user1@retro.net'
+    assert data['users'][1]['email'] == 'user2@retro.net'
+    assert 'id' in data['users'][0]
+    assert 'id' in data['users'][1]
+    # Ensure sensitive fields like password_hash are not exposed
+    assert 'password' not in data['users'][0]
+    assert 'password_hash' not in data['users'][0]
